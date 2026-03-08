@@ -194,11 +194,10 @@ function calculateRemainingBalance(principal, annualRate, monthsPaid) {
 
 // --- CHART THEME HELPERS ---
 function getChartColors() {
-  const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
   return {
-    text: isDark ? '#8899ab' : '#4a5568',
-    grid: isDark ? 'rgba(26,45,72,0.5)' : 'rgba(212,208,200,0.5)',
-    bg: isDark ? '#111f36' : '#ffffff'
+    text: '#4a5568',
+    grid: 'rgba(212,208,200,0.5)',
+    bg: '#ffffff'
   };
 }
 
@@ -245,7 +244,6 @@ function renderNav() {
       <a href="index.html" class="nav-brand">Ritz-Carlton <span>Portland</span></a>
       <div class="nav-links" id="nav-links">${links}</div>
       <div class="nav-controls">
-        <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme" aria-label="Toggle light/dark theme">&#9790;</button>
         <button class="nav-toggle" onclick="toggleNav()" aria-label="Toggle navigation">&#9776;</button>
       </div>
     </div>
@@ -257,46 +255,6 @@ function toggleNav() {
   if (links) links.classList.toggle('open');
 }
 
-// --- THEME ---
-function toggleTheme() {
-  const html = document.documentElement;
-  const current = html.getAttribute('data-theme');
-  const next = current === 'light' ? 'dark' : 'light';
-  html.setAttribute('data-theme', next);
-  localStorage.setItem('ritz-theme', next);
-
-  const btn = document.querySelector('.theme-toggle');
-  if (btn) btn.innerHTML = next === 'light' ? '&#9728;' : '&#9790;';
-
-  // Update all Chart.js instances
-  if (window.chartInstances) {
-    const c = getChartColors();
-    window.chartInstances.forEach(chart => {
-      if (chart.options.scales?.x) {
-        chart.options.scales.x.ticks.color = c.text;
-        chart.options.scales.x.grid.color = c.grid;
-        chart.options.scales.x.border.color = c.grid;
-      }
-      if (chart.options.scales?.y) {
-        chart.options.scales.y.ticks.color = c.text;
-        chart.options.scales.y.grid.color = c.grid;
-        chart.options.scales.y.border.color = c.grid;
-      }
-      if (chart.options.plugins?.title) chart.options.plugins.title.color = c.text;
-      if (chart.options.plugins?.legend?.labels) chart.options.plugins.legend.labels.color = c.text;
-      chart.update('none');
-    });
-  }
-}
-
-function initTheme() {
-  const saved = localStorage.getItem('ritz-theme');
-  if (saved) {
-    document.documentElement.setAttribute('data-theme', saved);
-    const btn = document.querySelector('.theme-toggle');
-    if (btn) btn.innerHTML = saved === 'light' ? '&#9728;' : '&#9790;';
-  }
-}
 
 // --- FOOTER ---
 function renderFooter() {
@@ -321,5 +279,4 @@ function registerChart(chart) {
 document.addEventListener('DOMContentLoaded', () => {
   renderNav();
   renderFooter();
-  initTheme();
 });
