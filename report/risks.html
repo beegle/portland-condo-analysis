@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Risk Matrix — Ritz-Carlton Portland</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="page-wrapper">
+  <nav class="nav" id="main-nav"></nav>
+
+  <section class="hero" style="padding-bottom:2rem">
+    <div class="container">
+      <span class="label" style="color:var(--gold)">Risk Assessment</span>
+      <h1 style="margin-top:0.5rem">Know What You're Buying Into</h1>
+      <p class="hero-subtitle">Six risk categories scored 1–10, with key data points and mitigation strategies. The composite score reflects the overall risk profile.</p>
+    </div>
+  </section>
+
+  <!-- Composite Score -->
+  <section>
+    <div class="container">
+      <div class="grid grid-2-1" style="gap:2.5rem; align-items:center">
+        <div>
+          <div class="section-header">
+            <span class="label">Composite Assessment</span>
+            <h2>Overall Risk: Moderate-High</h2>
+          </div>
+          <p>The weighted composite risk score is <strong>6.8 out of 10</strong>. This reflects a genuine opportunity paired with significant structural risks. The highest-weighted factors are HOA/carrying cost risk and liquidity risk — both driven by the building's 91.7% unsold inventory and Portland's broader market challenges.</p>
+          <p>For a patient buyer with a 7–10 year horizon who can absorb the carrying costs, many of these risks are manageable. For a buyer seeking near-term appreciation or income, the risk profile is unfavorable.</p>
+        </div>
+        <div style="display:flex; justify-content:center">
+          <div style="position:relative; width:200px; height:120px">
+            <canvas id="riskGauge" width="200" height="120"></canvas>
+            <div style="position:absolute; bottom:8px; left:50%; transform:translateX(-50%); text-align:center">
+              <span style="font-family:var(--font-display); font-size:2.5rem; font-weight:700; color:var(--orange)">6.8</span>
+              <span style="display:block; font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em">of 10</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Risk Cards -->
+  <section>
+    <div class="container">
+      <div class="grid grid-2" style="gap:1.5rem" id="risk-cards"></div>
+    </div>
+  </section>
+
+  <!-- Due Diligence Checklist -->
+  <section>
+    <div class="container">
+      <div class="section-header">
+        <span class="label">Action Items</span>
+        <h2>Due Diligence Checklist</h2>
+      </div>
+      <div class="grid grid-2" style="gap:1rem">
+        <div class="card">
+          <h4>Before Making an Offer</h4>
+          <ul style="list-style:none; font-size:0.88rem; color:var(--text-secondary)">
+            <li style="padding:0.4rem 0; border-bottom:1px solid var(--border)">&#9744; Request and review HOA financials (budget, actuals, reserves)</li>
+            <li style="padding:0.4rem 0; border-bottom:1px solid var(--border)">&#9744; Obtain reserve study — verify funding level</li>
+            <li style="padding:0.4rem 0; border-bottom:1px solid var(--border)">&#9744; Confirm status of $7.8M inclusionary housing fee</li>
+            <li style="padding:0.4rem 0; border-bottom:1px solid var(--border)">&#9744; Review master insurance policy limits and deductibles</li>
+            <li style="padding:0.4rem 0; border-bottom:1px solid var(--border)">&#9744; Verify parking — deeded vs. assigned, number of spaces</li>
+            <li style="padding:0.4rem 0">&#9744; Tour the unit in person — assess spatial flow and storage</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4>Before Closing</h4>
+          <ul style="list-style:none; font-size:0.88rem; color:var(--text-secondary)">
+            <li style="padding:0.4rem 0; border-bottom:1px solid var(--border)">&#9744; Engage Oregon real estate attorney for HOA review</li>
+            <li style="padding:0.4rem 0; border-bottom:1px solid var(--border)">&#9744; Obtain HO-6 insurance quote (incl. earthquake endorsement)</li>
+            <li style="padding:0.4rem 0; border-bottom:1px solid var(--border)">&#9744; Verify HOA delinquency rate across all owners</li>
+            <li style="padding:0.4rem 0; border-bottom:1px solid var(--border)">&#9744; Confirm Ready Capital's voting power and governance structure</li>
+            <li style="padding:0.4rem 0; border-bottom:1px solid var(--border)">&#9744; Understand rental restrictions (270-day rule, HOA bylaws)</li>
+            <li style="padding:0.4rem 0">&#9744; Request evidence of any pending special assessments</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="page-footer" id="page-footer"></footer>
+</div>
+
+<script src="app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const risks = [
+    {
+      name: 'Market Risk',
+      score: 7, level: 'high',
+      data: '34% office vacancy, 59,000 fewer daytime workers, Portland ranks 80th of 8,100 on market attractiveness',
+      mitigant: 'Crime down 17%, foot traffic at 86% recovery, no new condo supply pipeline (90% decline), violent crime at multi-year lows',
+      weight: 20
+    },
+    {
+      name: 'HOA & Carrying Cost Risk',
+      score: 8, level: 'high',
+      data: '$2,100–$2,500/mo HOA (3x downtown avg), $7.8M inclusionary fee status unknown, 121/132 units unsold concentrates HOA budget risk',
+      mitigant: 'New construction = no deferred maintenance for ~10 years, hotel operations subsidize some shared costs, Ready Capital incentivized to resolve fee',
+      weight: 25
+    },
+    {
+      name: 'Tax Burden Risk',
+      score: 6, level: 'medium',
+      data: 'Property tax 1.0–1.2%, Oregon income tax 9.9%, PFA 1.5–3%, Metro SHS 1%, 2025 Parks Levy adds $1,400/yr on $1M assessed',
+      mitigant: 'No sales tax (saves on furnishing), Measure 50 caps AV growth at 3%/year, second home may limit income surtax exposure',
+      weight: 15
+    },
+    {
+      name: 'Liquidity Risk',
+      score: 8, level: 'high',
+      data: 'Benson Tower: -10% nominal after 16 years, 130+ day avg DOM for luxury, thin buyer pool for $1M+ condos, 91.7% unsold at Ritz',
+      mitigant: 'Price reset may establish true market floor, no competing new supply for years, brand recognition aids future marketing',
+      weight: 20
+    },
+    {
+      name: 'Structural / Seismic Risk',
+      score: 4, level: 'low',
+      data: 'Cascadia Subduction Zone proximity, Portland\'s aging stormwater infrastructure',
+      mitigant: '2024 construction meets modern seismic code, earthquake insurance ~$225/yr, LEED Gold certification, newest tower in market',
+      weight: 5
+    },
+    {
+      name: 'Operational / Occupancy Risk',
+      score: 7, level: 'high',
+      data: 'Only 11 of 132 units owner-occupied, lender controls HOA voting power, hotel operations create dependency, HB 3746 shortens defect repose to 7 years',
+      mitigant: 'Ritz-Carlton brand management provides operational expertise, Ready Capital strongly incentivized to sell and normalize governance',
+      weight: 15
+    }
+  ];
+
+  // Risk Cards
+  document.getElementById('risk-cards').innerHTML = risks.map(r => `
+    <div class="risk-card risk-${r.level} animate-in">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem">
+        <h3 style="margin:0; font-size:1.1rem">${r.name}</h3>
+        <div style="display:flex; align-items:center; gap:0.5rem">
+          <span class="risk-score">${r.score}</span>
+          <span class="badge badge-${r.level === 'high' ? 'orange' : r.level === 'medium' ? 'gold' : 'blue'}">${r.level}</span>
+        </div>
+      </div>
+      <div style="margin-bottom:1rem">
+        <span class="label" style="display:block; margin-bottom:0.4rem">Key Data</span>
+        <p style="font-size:0.85rem; margin:0">${r.data}</p>
+      </div>
+      <div>
+        <span class="label" style="display:block; margin-bottom:0.4rem; color:var(--blue)">Mitigants</span>
+        <p style="font-size:0.85rem; margin:0; color:var(--blue-light)">${r.mitigant}</p>
+      </div>
+    </div>
+  `).join('');
+
+  // Risk Gauge
+  const compositeScore = risks.reduce((sum, r) => sum + r.score * r.weight, 0) / risks.reduce((sum, r) => sum + r.weight, 0);
+
+  registerChart(new Chart(document.getElementById('riskGauge'), {
+    type: 'doughnut',
+    data: {
+      datasets: [{
+        data: [compositeScore, 10 - compositeScore],
+        backgroundColor: [CHART_COLORS.orange, 'rgba(30,45,72,0.3)'],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      circumference: 180,
+      rotation: -90,
+      cutout: '78%',
+      responsive: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { enabled: false }
+      }
+    }
+  }));
+});
+</script>
+</body>
+</html>

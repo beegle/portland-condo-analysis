@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Comparable Analysis — Ritz-Carlton Portland</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="page-wrapper">
+  <nav class="nav" id="main-nav"></nav>
+
+  <section class="hero" style="padding-bottom:2rem">
+    <div class="container">
+      <span class="label" style="color:var(--gold)">Comparable Market Analysis</span>
+      <h1 style="margin-top:0.5rem">How the Ritz Stacks Up</h1>
+      <p class="hero-subtitle">9 competing luxury buildings compared on price, cost per square foot, carrying costs, and market velocity. Click column headers to sort.</p>
+    </div>
+  </section>
+
+  <!-- Sortable Table -->
+  <section>
+    <div class="container">
+      <div class="section-header">
+        <span class="label">Building Comparison</span>
+        <h2>All Comparable Properties</h2>
+      </div>
+      <div class="table-wrap">
+        <table id="comp-table">
+          <thead>
+            <tr>
+              <th data-col="name">Building <span class="sort-arrow">&#9650;</span></th>
+              <th data-col="year">Year <span class="sort-arrow">&#9650;</span></th>
+              <th data-col="neighborhood">Area <span class="sort-arrow">&#9650;</span></th>
+              <th data-col="sqft">Sq Ft <span class="sort-arrow">&#9650;</span></th>
+              <th data-col="beds">Beds <span class="sort-arrow">&#9650;</span></th>
+              <th data-col="price">Price <span class="sort-arrow">&#9650;</span></th>
+              <th data-col="ppsf">$/SF <span class="sort-arrow">&#9650;</span></th>
+              <th data-col="hoaMonthly">HOA/Mo <span class="sort-arrow">&#9650;</span></th>
+              <th data-col="hoaPSF">HOA $/SF <span class="sort-arrow">&#9650;</span></th>
+              <th data-col="dom">DOM <span class="sort-arrow">&#9650;</span></th>
+            </tr>
+          </thead>
+          <tbody id="comp-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- PPSF Chart -->
+  <section>
+    <div class="container">
+      <div class="grid grid-2" style="gap:2rem">
+        <div class="chart-container">
+          <canvas id="ppsfChart" height="400"></canvas>
+        </div>
+        <div class="chart-container">
+          <canvas id="hoaChart" height="400"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10-Year HOA Differential -->
+  <section>
+    <div class="container">
+      <div class="section-header">
+        <span class="label">Carrying Cost Impact</span>
+        <h2>10-Year HOA Cost Comparison</h2>
+      </div>
+      <p>The Ritz-Carlton's HOA premium compounds dramatically over time. This chart shows total HOA paid over 10 years (assuming 3% annual escalation) for each building.</p>
+      <div class="chart-container" style="margin-top:1.5rem">
+        <canvas id="hoaCumChart" height="350"></canvas>
+      </div>
+      <div class="conclusion-box" style="margin-top:1.5rem">
+        <h3>The Hidden Cost</h3>
+        <p>Over 10 years, the Ritz-Carlton HOA premium vs. Vista North Pearl exceeds <strong>$190,000</strong>. Against The Encore (~$550/mo), the gap reaches <strong>$228,000+</strong>. A Ritz unit priced $200K below a competitor may actually cost <em>more</em> to own when carrying costs are included.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="page-footer" id="page-footer"></footer>
+</div>
+
+<script src="app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // Build full comp list including Ritz
+  const ritzEntry = {
+    name: 'Ritz-Carlton Residences', year: 2024, neighborhood: 'Downtown',
+    sqft: 1673, beds: 2, price: 1235000, ppsf: 738, hoaMonthly: 2467,
+    hoaPSF: (2467/1673).toFixed(2), dom: 17, isRitz: true
+  };
+
+  const allComps = [ritzEntry, ...DATA.comparables.map(c => ({
+    ...c, hoaPSF: (c.hoaMonthly / c.sqft).toFixed(2), isRitz: false
+  }))];
+
+  let sortCol = 'ppsf';
+  let sortAsc = true;
+
+  function renderTable(data) {
+    const tbody = document.getElementById('comp-body');
+    tbody.innerHTML = data.map(c => `
+      <tr class="${c.isRitz ? 'highlight' : ''}">
+        <td><strong>${c.name}</strong></td>
+        <td>${c.year || '—'}</td>
+        <td>${c.neighborhood}</td>
+        <td>${fmtNum(c.sqft)}</td>
+        <td>${c.beds}BR</td>
+        <td>${fmt(c.price)}</td>
+        <td><strong>$${c.ppsf}</strong></td>
+        <td>${fmt(c.hoaMonthly)}</td>
+        <td>$${c.hoaPSF}</td>
+        <td>${c.dom || '—'}</td>
+      </tr>
+    `).join('');
+  }
+
+  function sortData(col) {
+    if (sortCol === col) { sortAsc = !sortAsc; } else { sortCol = col; sortAsc = true; }
+    allComps.sort((a, b) => {
+      let va = a[col], vb = b[col];
+      if (typeof va === 'string') return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+      va = va || 0; vb = vb || 0;
+      return sortAsc ? va - vb : vb - va;
+    });
+    renderTable(allComps);
+    document.querySelectorAll('#comp-table th').forEach(th => {
+      th.classList.toggle('sorted', th.dataset.col === col);
+      const arrow = th.querySelector('.sort-arrow');
+      if (th.dataset.col === col) arrow.innerHTML = sortAsc ? '&#9650;' : '&#9660;';
+    });
+  }
+
+  document.querySelectorAll('#comp-table th[data-col]').forEach(th => {
+    th.addEventListener('click', () => sortData(th.dataset.col));
+  });
+
+  sortData('ppsf');
+
+  // PPSF Bar Chart
+  const ppsfData = [...allComps].sort((a, b) => a.ppsf - b.ppsf);
+  const ppsfChart = registerChart(new Chart(document.getElementById('ppsfChart'), {
+    type: 'bar',
+    data: {
+      labels: ppsfData.map(c => c.name.replace('Residences', '').trim()),
+      datasets: [{
+        data: ppsfData.map(c => c.ppsf),
+        backgroundColor: ppsfData.map(c => c.isRitz ? CHART_COLORS.gold : CHART_COLORS.blue),
+        borderRadius: 4,
+        barThickness: 24
+      }]
+    },
+    options: {
+      ...baseChartOptions('Price Per Square Foot ($)'),
+      indexAxis: 'y',
+      plugins: { ...baseChartOptions().plugins, legend: { display: false } },
+      scales: {
+        x: { ...baseChartOptions().scales.x, title: { display: true, text: '$/SF', color: getChartColors().text, font: { family: "'Outfit', sans-serif" } } },
+        y: { ...baseChartOptions().scales.y, grid: { display: false } }
+      }
+    }
+  }));
+
+  // Monthly HOA Bar Chart
+  const hoaData = [...allComps].sort((a, b) => a.hoaMonthly - b.hoaMonthly);
+  const hoaChart = registerChart(new Chart(document.getElementById('hoaChart'), {
+    type: 'bar',
+    data: {
+      labels: hoaData.map(c => c.name.replace('Residences', '').trim()),
+      datasets: [{
+        data: hoaData.map(c => c.hoaMonthly),
+        backgroundColor: hoaData.map(c => c.isRitz ? CHART_COLORS.orange : CHART_COLORS.blue),
+        borderRadius: 4,
+        barThickness: 24
+      }]
+    },
+    options: {
+      ...baseChartOptions('Monthly HOA Fees ($)'),
+      indexAxis: 'y',
+      plugins: { ...baseChartOptions().plugins, legend: { display: false } },
+      scales: {
+        x: { ...baseChartOptions().scales.x, ticks: { ...baseChartOptions().scales.x.ticks, callback: v => '$' + v.toLocaleString() }, title: { display: true, text: '$/month', color: getChartColors().text, font: { family: "'Outfit', sans-serif" } } },
+        y: { ...baseChartOptions().scales.y, grid: { display: false } }
+      }
+    }
+  }));
+
+  // 10-Year Cumulative HOA
+  const hoaCumData = [...allComps].sort((a, b) => {
+    const calcCum = (monthly) => { let t = 0; for (let y = 0; y < 10; y++) t += monthly * Math.pow(1.03, y) * 12; return t; };
+    return calcCum(a.hoaMonthly) - calcCum(b.hoaMonthly);
+  });
+
+  const cumValues = hoaCumData.map(c => {
+    let total = 0;
+    for (let y = 0; y < 10; y++) total += c.hoaMonthly * Math.pow(1.03, y) * 12;
+    return Math.round(total);
+  });
+
+  registerChart(new Chart(document.getElementById('hoaCumChart'), {
+    type: 'bar',
+    data: {
+      labels: hoaCumData.map(c => c.name.replace('Residences', '').trim()),
+      datasets: [{
+        label: '10-Year Cumulative HOA',
+        data: cumValues,
+        backgroundColor: hoaCumData.map(c => c.isRitz ? CHART_COLORS.orange : CHART_COLORS.blue),
+        borderRadius: 4,
+        barThickness: 28
+      }]
+    },
+    options: {
+      ...baseChartOptions(),
+      indexAxis: 'y',
+      plugins: { ...baseChartOptions().plugins, legend: { display: false } },
+      scales: {
+        x: { ...baseChartOptions().scales.x, ticks: { ...baseChartOptions().scales.x.ticks, callback: v => '$' + (v/1000).toFixed(0) + 'K' } },
+        y: { ...baseChartOptions().scales.y, grid: { display: false } }
+      }
+    }
+  }));
+});
+</script>
+</body>
+</html>

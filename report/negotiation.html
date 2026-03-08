@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Negotiation Intelligence — Ritz-Carlton Portland</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="page-wrapper">
+  <nav class="nav" id="main-nav"></nav>
+
+  <section class="hero" style="padding-bottom:2rem">
+    <div class="container">
+      <span class="label" style="color:var(--gold)">Negotiation Intelligence</span>
+      <h1 style="margin-top:0.5rem">Your Leverage Is Real</h1>
+      <p class="hero-subtitle">Ready Capital holds 121 unsold units and is bleeding $254K/month in HOA alone. Here's how to use the data to negotiate.</p>
+    </div>
+  </section>
+
+  <!-- PPSF Framework -->
+  <section>
+    <div class="container">
+      <div class="section-header">
+        <span class="label">Pricing Framework</span>
+        <h2>Two Comp Benchmarks</h2>
+      </div>
+      <p>The market recognizes two distinct pricing tiers. Your negotiation should anchor on one of these frameworks, then apply a transparent premium for the Ritz service bundle.</p>
+
+      <div style="margin:2rem 0">
+        <div class="ppsf-bar-wrap">
+          <div class="ppsf-bar-label">Resale Luxury (2004–2008 towers): $425–$526/SF</div>
+          <div class="ppsf-bar-track">
+            <div class="ppsf-bar-fill" style="left:0; width:52%; background:var(--blue)">$425–$526/SF</div>
+          </div>
+        </div>
+        <div class="ppsf-bar-wrap" style="margin-top:1rem">
+          <div class="ppsf-bar-label">Branded / New Construction: $749–$803/SF</div>
+          <div class="ppsf-bar-track">
+            <div class="ppsf-bar-fill" style="left:0; width:80%; background:var(--gold)">$749–$803/SF</div>
+          </div>
+        </div>
+        <div class="ppsf-bar-wrap" style="margin-top:1rem">
+          <div class="ppsf-bar-label">Ritz Current Ask Range: $423–$854/SF</div>
+          <div class="ppsf-bar-track">
+            <div class="ppsf-bar-fill" style="left:0; width:85%; background:linear-gradient(90deg, var(--blue), var(--gold), var(--orange))">$423–$854/SF</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Offer Calculator -->
+  <section>
+    <div class="container">
+      <div class="section-header">
+        <span class="label">Offer Calculator</span>
+        <h2>What Should You Pay?</h2>
+      </div>
+
+      <div class="slider-group" style="max-width:400px; margin-bottom:2rem">
+        <div class="slider-header"><span class="slider-label">Select Target Unit</span></div>
+        <select id="unit-select" style="width:100%; padding:0.6rem; background:var(--bg-input); color:var(--text-primary); border:1px solid var(--border); border-radius:var(--radius); font-family:var(--font-body); font-size:0.9rem">
+        </select>
+      </div>
+
+      <div class="grid grid-3" style="gap:1.5rem" id="offer-cards"></div>
+
+      <div class="card" style="margin-top:1.5rem">
+        <h4>Negotiation Justification</h4>
+        <p id="justification" style="font-size:0.9rem"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Carrying Cost Leverage -->
+  <section>
+    <div class="container">
+      <div class="section-header">
+        <span class="label">Seller Pressure</span>
+        <h2>Ready Capital's Burn Rate</h2>
+      </div>
+
+      <div class="grid grid-3" style="gap:1.5rem">
+        <div class="metric-card card-gold">
+          <span class="metric-label">Monthly HOA Burn</span>
+          <span class="metric-value" style="color:var(--gold)">$254K</span>
+          <span class="metric-context">121 unsold units × ~$2,100/mo avg</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Annual HOA Burn</span>
+          <span class="metric-value" style="color:var(--orange)">$3.05M</span>
+          <span class="metric-context">Plus property taxes on unsold inventory</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Absorption Rate</span>
+          <span class="metric-value" style="color:var(--orange)">11 units</span>
+          <span class="metric-context">Sold in ~18 months (0.6 units/month)</span>
+        </div>
+      </div>
+
+      <div class="conclusion-box" style="margin-top:1.5rem">
+        <h3>What This Means</h3>
+        <p>At the current absorption rate of 0.6 units/month, it would take <strong>~17 years</strong> to sell the remaining inventory. Every month of delay costs Ready Capital $254,000+ in HOA alone (before property taxes, insurance, and financing costs). This creates extreme urgency on the seller side. You are not negotiating with a homeowner who loves their unit — you are negotiating with a lender trying to liquidate distressed assets.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Days on Market Analysis -->
+  <section>
+    <div class="container">
+      <div class="section-header">
+        <span class="label">Market Velocity</span>
+        <h2>Days on Market by Building</h2>
+      </div>
+      <div class="chart-container">
+        <canvas id="domChart" height="350"></canvas>
+      </div>
+      <p style="margin-top:1rem; font-size:0.88rem">The Ritz #2805 sold in just 8 days at $749/SF — proving that correctly priced units clear quickly. Leverage against overpriced units: "Correctly priced Ritz units sell in a week. This one has been sitting because the price is wrong."</p>
+    </div>
+  </section>
+
+  <!-- Negotiation Strategies -->
+  <section>
+    <div class="container">
+      <div class="section-header">
+        <span class="label">Playbook</span>
+        <h2>Negotiation Strategies</h2>
+      </div>
+      <div class="grid grid-2" style="gap:1.5rem">
+        <div class="card">
+          <h4>1. Monetize Carrying Costs</h4>
+          <p style="font-size:0.88rem; margin:0">Request seller-paid HOA credits (3–6 months prepaid) or closing cost credits. The #2805 listing disclosed a $5,009 one-time capital improvement contribution — these are negotiable.</p>
+        </div>
+        <div class="card">
+          <h4>2. Anchor on PPSF + HOA-Adjusted Payment</h4>
+          <p style="font-size:0.88rem; margin:0">Don't just compare sticker prices. Show the total monthly cost vs. a Vista or Cosmopolitan unit. The Ritz HOA wipes out its price advantage.</p>
+        </div>
+        <div class="card">
+          <h4>3. Target Time-on-Market Asymmetry</h4>
+          <p style="font-size:0.88rem; margin:0">Fresh listings (days old) have less leverage. Units that have sat for weeks or months have maximum seller motivation. Check listing dates before offering.</p>
+        </div>
+        <div class="card">
+          <h4>4. Demand Full Disclosure</h4>
+          <p style="font-size:0.88rem; margin:0">Request: HOA financials, reserve study, status of $7.8M inclusionary fee, master insurance policy, pending assessments, and delinquency rates. Any gaps are negotiation ammunition.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="page-footer" id="page-footer"></footer>
+</div>
+
+<script src="app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // Populate unit selector
+  const select = document.getElementById('unit-select');
+  DATA.units.filter(u => u.status === 'Active').forEach(u => {
+    const opt = document.createElement('option');
+    opt.value = JSON.stringify(u);
+    opt.textContent = `${u.unit} — ${u.beds}BR/${u.baths}BA, ${fmtNum(u.sqft)} SF, ${fmt(u.price)}`;
+    select.appendChild(opt);
+  });
+
+  function updateOffers() {
+    const unit = JSON.parse(select.value);
+    const resalePPSF = 475;
+    const brandedPPSF = 750;
+
+    const aggressive = Math.round(unit.sqft * resalePPSF);
+    const moderate = Math.round(unit.sqft * ((resalePPSF + brandedPPSF) / 2));
+    const full = unit.price;
+
+    const offers = [
+      { label: 'Aggressive', desc: 'Based on resale luxury comps (~$475/SF)', price: aggressive, color: 'var(--blue)', diff: ((aggressive/full - 1) * 100).toFixed(0) },
+      { label: 'Market', desc: 'Blended resale + branded (~$613/SF)', price: moderate, color: 'var(--gold)', diff: ((moderate/full - 1) * 100).toFixed(0) },
+      { label: 'Full Ask', desc: "Christie's listed price", price: full, color: 'var(--text-muted)', diff: '0' }
+    ];
+
+    document.getElementById('offer-cards').innerHTML = offers.map(o => {
+      const diffNum = parseFloat(o.diff);
+      let badgeText, badgeClass;
+      if (diffNum < 0) {
+        badgeText = `${Math.abs(diffNum)}% below ask`;
+        badgeClass = 'badge-blue';
+      } else if (diffNum > 0) {
+        badgeText = `${diffNum}% above ask`;
+        badgeClass = 'badge-gold';
+      } else {
+        badgeText = 'Listed price';
+        badgeClass = 'badge-gold';
+      }
+      return `
+      <div class="metric-card ${o.label === 'Market' ? 'card-gold' : ''}">
+        <span class="metric-label">${o.label} Offer</span>
+        <span class="metric-value" style="font-size:1.5rem; color:${o.color}">${fmt(o.price)}</span>
+        <span class="metric-context">${o.desc}</span>
+        <span class="badge ${badgeClass}" style="margin-top:0.5rem">${badgeText}</span>
+      </div>`;
+    }).join('');
+
+    document.getElementById('justification').innerHTML = `
+      For <strong>${unit.unit}</strong> (${fmtNum(unit.sqft)} SF at ${fmt(unit.price)} = $${unit.ppsf}/SF):
+      Resale luxury comps clear at $425–526/SF, while the only confirmed Ritz sale cleared at $749/SF.
+      With HOA at ${fmt(unit.hoa)}/mo and 121 unsold units creating massive lender pressure,
+      a <strong>market offer of ${fmt(moderate)}</strong> ($${Math.round(moderate/unit.sqft)}/SF) is well-justified.
+      An aggressive offer of ${fmt(aggressive)} anchors on resale comps and forces the lender to justify the branded premium.
+    `;
+  }
+
+  select.addEventListener('change', updateOffers);
+  updateOffers();
+
+  // DOM Chart
+  const domData = [
+    { name: 'Ritz #2805', dom: 8, color: CHART_COLORS.gold },
+    { name: 'Cosmopolitan', dom: 14, color: CHART_COLORS.blue },
+    { name: 'Meriwether', dom: 48, color: CHART_COLORS.blue },
+    { name: 'Park Ave West', dom: 114, color: CHART_COLORS.blue },
+    { name: 'The Henry', dom: 118, color: CHART_COLORS.blue },
+    { name: 'The Casey', dom: 133, color: CHART_COLORS.blue },
+    { name: 'Vista #1802', dom: 162, color: CHART_COLORS.blue },
+    { name: 'Park Ave #1331', dom: 165, color: CHART_COLORS.blue },
+    { name: 'Vista #1106', dom: 295, color: CHART_COLORS.orange },
+    { name: 'Metropolitan', dom: 306, color: CHART_COLORS.orange }
+  ];
+
+  registerChart(new Chart(document.getElementById('domChart'), {
+    type: 'bar',
+    data: {
+      labels: domData.map(d => d.name),
+      datasets: [{
+        data: domData.map(d => d.dom),
+        backgroundColor: domData.map(d => d.color),
+        borderRadius: 4,
+        barThickness: 24
+      }]
+    },
+    options: {
+      ...baseChartOptions('Days on Market (Recent Sales & Active Listings)'),
+      indexAxis: 'y',
+      plugins: { ...baseChartOptions().plugins, legend: { display: false } },
+      scales: {
+        x: { ...baseChartOptions().scales.x, title: { display: true, text: 'Days', color: getChartColors().text, font: { family: "'Outfit', sans-serif" } } },
+        y: { ...baseChartOptions().scales.y, grid: { display: false } }
+      }
+    }
+  }));
+});
+</script>
+</body>
+</html>

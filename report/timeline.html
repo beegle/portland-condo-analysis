@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Market Timeline — Ritz-Carlton Portland</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="page-wrapper">
+  <nav class="nav" id="main-nav"></nav>
+
+  <section class="hero" style="padding-bottom:2rem">
+    <div class="container">
+      <span class="label" style="color:var(--gold)">Market Outlook</span>
+      <h1 style="margin-top:0.5rem">The Road Ahead</h1>
+      <p class="hero-subtitle">Key events from the tower's opening through the projected recovery window. The most likely path is gradual normalization, not a sharp rebound.</p>
+    </div>
+  </section>
+
+  <!-- Timeline -->
+  <section>
+    <div class="container" style="max-width:800px">
+      <div class="timeline" id="market-timeline"></div>
+    </div>
+  </section>
+
+  <!-- Market Indicators -->
+  <section>
+    <div class="container">
+      <div class="section-header">
+        <span class="label">Recovery Signals</span>
+        <h2>What to Watch</h2>
+      </div>
+      <div class="grid grid-3" style="gap:1.5rem">
+        <div class="card">
+          <h4 style="color:var(--blue)">Positive Signals</h4>
+          <ul style="list-style:none; font-size:0.88rem; color:var(--text-secondary)">
+            <li style="padding:0.4rem 0; border-bottom:1px solid var(--border)">&#9650; Violent crime down 17% (H1 2025)</li>
+            <li style="padding:0.4rem 0; border-bottom:1px solid var(--border)">&#9650; Homicides down 51% — steepest drop among 68 major cities</li>
+            <li style="padding:0.4rem 0; border-bottom:1px solid var(--border)">&#9650; Foot traffic at 86% of pre-pandemic levels</li>
+            <li style="padding:0.4rem 0; border-bottom:1px solid var(--border)">&#9650; Mortgage rates improved (6.00% vs. 6.63% a year ago)</li>
+            <li style="padding:0.4rem 0; border-bottom:1px solid var(--border)">&#9650; Condo development pipeline collapsed 90% — no future supply</li>
+            <li style="padding:0.4rem 0">&#9650; Only 656 multifamily units in pipeline (lowest since 2011)</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4 style="color:var(--orange)">Headwinds</h4>
+          <ul style="list-style:none; font-size:0.88rem; color:var(--text-secondary)">
+            <li style="padding:0.4rem 0; border-bottom:1px solid var(--border)">&#9660; 34% CBD office vacancy (among highest nationally)</li>
+            <li style="padding:0.4rem 0; border-bottom:1px solid var(--border)">&#9660; 59,000 fewer daytime workers vs. 2019</li>
+            <li style="padding:0.4rem 0; border-bottom:1px solid var(--border)">&#9660; Pearl District PPSF down 13.26% YoY</li>
+            <li style="padding:0.4rem 0; border-bottom:1px solid var(--border)">&#9660; 972 active listings (up from 831 in 2024)</li>
+            <li style="padding:0.4rem 0; border-bottom:1px solid var(--border)">&#9660; Avg DOM 130 days (up 132% YoY)</li>
+            <li style="padding:0.4rem 0">&#9660; Oregon tax stack $30–40K/yr for high earners</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4 style="color:var(--gold)">Key Inflection Points</h4>
+          <ul style="list-style:none; font-size:0.88rem; color:var(--text-secondary)">
+            <li style="padding:0.4rem 0; border-bottom:1px solid var(--border)">&#9679; Office vacancy projected to peak end of 2026</li>
+            <li style="padding:0.4rem 0; border-bottom:1px solid var(--border)">&#9679; Mortgage rate forecast: ~5.9% by EOY 2026</li>
+            <li style="padding:0.4rem 0; border-bottom:1px solid var(--border)">&#9679; Remote work patterns stabilizing nationally</li>
+            <li style="padding:0.4rem 0; border-bottom:1px solid var(--border)">&#9679; FLOCK food hall + ground retail maturation</li>
+            <li style="padding:0.4rem 0; border-bottom:1px solid var(--border)">&#9679; Ritz-Carlton hotel occupancy/reputation building</li>
+            <li style="padding:0.4rem 0">&#9679; Supply pipeline empty = potential scarcity by 2028–30</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Outlook Summary -->
+  <section>
+    <div class="container">
+      <div class="conclusion-box">
+        <h3>The Bottom Line on Timing</h3>
+        <p>The most likely near-term path for Portland luxury condos is <strong>gradual normalization, not a sharp rebound</strong>. The structural headwinds — office vacancy, negative perception, tax burden — are real and unlikely to fully resolve in 2–3 years. But the supply pipeline has shut off, crime metrics are improving sharply, and rates have moved in the right direction.</p>
+        <p style="margin-top:0.75rem">For a buyer who plans to hold <strong>7–10 years</strong> and genuinely wants to use the unit: the per-square-foot values available today may not recur. For a buyer seeking near-term appreciation or pure investment returns, the math remains challenging. The optimal window to negotiate is <strong>now through mid-2026</strong>, while Ready Capital is under maximum pressure to move inventory before office vacancy peaks.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="page-footer" id="page-footer"></footer>
+</div>
+
+<script src="app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const events = [
+    { date: 'Oct 2023', title: 'Ritz-Carlton Hotel Opens', desc: 'Portland\'s first five-star hotel opens after 4 years of construction. 251 rooms, FLOCK food hall to follow.', type: 'neutral' },
+    { date: '2024', title: 'Residential Launch at $2,096/SF', desc: '132 condos listed at aspirational pricing. 1BR from $1.2M. Market rejects pricing across the board.', type: 'negative' },
+    { date: 'Feb 2025', title: 'FLOCK Food Hall Opens', desc: 'Ground-floor food hall opens with ribbon cutting. Adds street-level activation and neighborhood amenity.', type: 'positive' },
+    { date: 'H1 2025', title: 'Only 11 Units Sold in ~18 Months', desc: '8 of 11 with zero DOM (insider/pre-sales). Open-market absorption effectively near zero.', type: 'negative' },
+    { date: 'Summer 2025', title: 'Deed-in-Lieu of Foreclosure', desc: 'BPM surrenders 121 unsold units to Ready Capital. Institutional distress, not consumer foreclosure.', type: 'negative' },
+    { date: 'H1 2025', title: 'Crime Drops Sharply', desc: 'Violent crime -17%, homicides -51% — steepest decline of 68 major U.S. cities tracked.', type: 'positive' },
+    { date: 'Nov 2025', title: '2025 Parks Levy Approved', desc: '$1.40/$1K assessed value. Adds ~$1,400/yr to a $1M condo. Increases park maintenance and safety.', type: 'negative' },
+    { date: 'Dec 2025', title: 'Christie\'s Appointed as Broker', desc: 'Christie\'s International Real Estate Evergreen named exclusive brokerage. Plans 50% price reset.', type: 'neutral' },
+    { date: 'Jan 2026', title: '50–65% Price Reset Goes Live', desc: '2BR repriced from $2.1–2.6M to ~$1M. Shockwave ripples through all Portland luxury buildings.', type: 'current' },
+    { date: 'Mar 2026', title: 'Current: Your Window', desc: 'Ritz #2805 sold at $749/SF in 8 days. 4 active units $705K–$1.235M. Mortgage at 6.00%. Maximum buyer leverage.', type: 'current' },
+    { date: 'H2 2026', title: 'Rate Forecast: ~5.9%', desc: 'Fannie Mae projects modest improvement. May expand buyer pool but sellers may also re-enter.', type: 'positive' },
+    { date: 'End 2026', title: 'Office Vacancy Projected Peak', desc: 'Portland Metro Chamber projects vacancy peaks late 2026, then gradual decline. Inflection point for downtown.', type: 'neutral' },
+    { date: '2027–2028', title: 'Potential Recovery Zone', desc: 'Empty supply pipeline (only 656 units), stabilizing crime, possible rate improvement. Watch for absorption acceleration.', type: 'positive' },
+    { date: '2029–2030', title: '7-Year Hold Assessment', desc: 'If purchased in 2026, this is when early buyers evaluate their position. Supply scarcity may be supporting values.', type: 'neutral' },
+    { date: '2033', title: '7–10 Year Exit Window', desc: 'Full market cycle. If downtown revitalization materializes, this is the harvest period for patient capital.', type: 'positive' }
+  ];
+
+  document.getElementById('market-timeline').innerHTML = events.map(e => `
+    <div class="timeline-item animate-in">
+      <div class="timeline-dot ${e.type}"></div>
+      <div class="timeline-content">
+        <div class="timeline-date">${e.date}</div>
+        <h4>${e.title}</h4>
+        <p>${e.desc}</p>
+      </div>
+    </div>
+  `).join('');
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Break-Even Analysis — Ritz-Carlton Portland</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="page-wrapper">
+  <nav class="nav" id="main-nav"></nav>
+
+  <section class="hero" style="padding-bottom:2rem">
+    <div class="container">
+      <span class="label" style="color:var(--gold)">Break-Even Analysis</span>
+      <h1 style="margin-top:0.5rem">When Does It Pay Off?</h1>
+      <p class="hero-subtitle">Compare real estate returns against the S&P 500 and renting. Adjust appreciation and return assumptions with the sliders.</p>
+    </div>
+  </section>
+
+  <!-- RE vs S&P 500 -->
+  <section>
+    <div class="container">
+      <div class="section-header">
+        <span class="label">Scenario A</span>
+        <h2>Real Estate Returns vs. S&P 500</h2>
+      </div>
+      <p>This chart compares your total real estate position (appreciation + equity buildup - all carrying costs) against investing the same capital in the S&P 500.</p>
+
+      <div class="grid grid-2" style="gap:1rem; margin:1.5rem 0">
+        <div class="slider-group">
+          <div class="slider-header"><span class="slider-label">Annual Appreciation</span><span class="slider-value" id="v-appr"></span></div>
+          <input type="range" id="s-appr" min="-5" max="8" step="0.5" value="2">
+        </div>
+        <div class="slider-group">
+          <div class="slider-header"><span class="slider-label">S&P 500 Return</span><span class="slider-value" id="v-sp"></span></div>
+          <input type="range" id="s-sp" min="4" max="14" step="0.5" value="10">
+        </div>
+      </div>
+
+      <div class="chart-container">
+        <canvas id="reVsSpChart" height="380"></canvas>
+      </div>
+
+      <div id="crossover-note" class="card" style="margin-top:1rem; text-align:center"></div>
+    </div>
+  </section>
+
+  <!-- Own vs Rent -->
+  <section>
+    <div class="container">
+      <div class="section-header">
+        <span class="label">Scenario B</span>
+        <h2>Own vs. Rent</h2>
+      </div>
+      <p>Compare the cumulative cost of owning this unit vs. renting a comparable luxury condo in Portland and investing the down payment in the market.</p>
+
+      <div class="grid grid-2" style="gap:1rem; margin:1.5rem 0">
+        <div class="slider-group">
+          <div class="slider-header"><span class="slider-label">Luxury Rent (Monthly)</span><span class="slider-value" id="v-rent"></span></div>
+          <input type="range" id="s-rent" min="3000" max="7000" step="250" value="4500">
+        </div>
+        <div class="slider-group">
+          <div class="slider-header"><span class="slider-label">Rent Inflation</span><span class="slider-value" id="v-rentinf"></span></div>
+          <input type="range" id="s-rentinf" min="1" max="5" step="0.5" value="3">
+        </div>
+      </div>
+
+      <div class="chart-container">
+        <canvas id="ownVsRentChart" height="380"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sensitivity Matrix -->
+  <section>
+    <div class="container">
+      <div class="section-header">
+        <span class="label">Scenario C</span>
+        <h2>Sensitivity Matrix</h2>
+      </div>
+      <p>Net advantage of RE vs. S&P 500 (at 10% annual return) across different appreciation rates and hold periods. <span style="color:var(--blue)">Blue = RE outperforms</span>, <span style="color:var(--orange)">Orange = S&P outperforms</span>.</p>
+
+      <div class="table-wrap" style="margin-top:1.5rem">
+        <table class="matrix-table" id="sensitivity-matrix">
+          <thead>
+            <tr>
+              <th>Appreciation &#8595; / Hold &#8594;</th>
+              <th>5 Years</th>
+              <th>7 Years</th>
+              <th>10 Years</th>
+            </tr>
+          </thead>
+          <tbody id="matrix-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <footer class="page-footer" id="page-footer"></footer>
+</div>
+
+<script src="app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const price = DEFAULTS.purchasePrice;
+  const dpPct = DEFAULTS.downPaymentPct / 100;
+  const downPayment = price * dpPct;
+  const loanAmount = price - downPayment;
+  const mortgageRate = DEFAULTS.mortgageRate;
+  const hoa = DEFAULTS.hoaMonthly;
+  const taxRate = DEFAULTS.propertyTaxRate / 100;
+  const monthlyPI = calculateMonthlyPayment(loanAmount, mortgageRate, 360);
+
+  let reVsSpChart, ownVsRentChart;
+
+  function calcREReturn(year, apprRate) {
+    const appreciation = price * (Math.pow(1 + apprRate / 100, year) - 1);
+    const equity = calculateCumulativePrincipal(loanAmount, mortgageRate, year * 12);
+    let costs = 0;
+    for (let y = 0; y < year; y++) {
+      costs += (monthlyPI * 12) - (monthlyPI * 12 - calculateCumulativePrincipal(loanAmount, mortgageRate, (y+1)*12) + calculateCumulativePrincipal(loanAmount, mortgageRate, y*12)); // interest only
+      costs += hoa * Math.pow(1.03, y) * 12;
+      costs += price * taxRate;
+      costs += DEFAULTS.insuranceAnnual;
+      costs += DEFAULTS.maintenanceReserve;
+    }
+    // Simplification: total interest paid
+    let totalInterest = 0;
+    const r = mortgageRate / 100 / 12;
+    let bal = loanAmount;
+    for (let m = 0; m < year * 12; m++) {
+      totalInterest += bal * r;
+      bal -= (monthlyPI - bal * r);
+    }
+
+    let totalHOA = 0;
+    for (let y = 0; y < year; y++) totalHOA += hoa * Math.pow(1.03, y) * 12;
+    const totalTax = price * taxRate * year;
+    const totalInsurance = DEFAULTS.insuranceAnnual * year;
+    const totalMaint = DEFAULTS.maintenanceReserve * year;
+    const totalCosts = totalInterest + totalHOA + totalTax + totalInsurance + totalMaint;
+
+    return downPayment + appreciation + equity - totalCosts - downPayment; // net gain/loss
+  }
+
+  function calcSPReturn(year, spRate) {
+    const totalCapital = downPayment + (price * 0.03); // down payment + closing costs
+    return totalCapital * (Math.pow(1 + spRate / 100, year) - 1);
+  }
+
+  function updateREvsSpChart() {
+    const apprRate = +document.getElementById('s-appr').value;
+    const spRate = +document.getElementById('s-sp').value;
+
+    document.getElementById('v-appr').textContent = apprRate.toFixed(1) + '%';
+    document.getElementById('v-sp').textContent = spRate.toFixed(1) + '%';
+
+    const years = Array.from({length: 10}, (_, i) => i + 1);
+    const reData = years.map(y => Math.round(calcREReturn(y, apprRate)));
+    const spData = years.map(y => Math.round(calcSPReturn(y, spRate)));
+
+    // Find crossover
+    let crossoverYear = null;
+    for (let i = 1; i < years.length; i++) {
+      if ((reData[i-1] < spData[i-1] && reData[i] >= spData[i]) ||
+          (reData[i-1] > spData[i-1] && reData[i] <= spData[i])) {
+        crossoverYear = years[i];
+      }
+    }
+
+    const noteEl = document.getElementById('crossover-note');
+    if (reData[9] > spData[9]) {
+      noteEl.innerHTML = `<p style="color:var(--blue); margin:0"><strong>At these assumptions, real estate outperforms the S&P 500 at year 10</strong> by ${fmtK(reData[9] - spData[9])}.</p>`;
+    } else {
+      noteEl.innerHTML = `<p style="color:var(--orange); margin:0"><strong>At these assumptions, the S&P 500 outperforms real estate at year 10</strong> by ${fmtK(spData[9] - reData[9])}. ${crossoverYear ? 'RE briefly catches up around year ' + crossoverYear + '.' : 'RE does not catch up within 10 years.'}</p>`;
+    }
+
+    if (reVsSpChart) reVsSpChart.destroy();
+    const c = getChartColors();
+    reVsSpChart = registerChart(new Chart(document.getElementById('reVsSpChart'), {
+      type: 'line',
+      data: {
+        labels: years.map(y => 'Year ' + y),
+        datasets: [
+          { label: 'Real Estate Net Return', data: reData, borderColor: CHART_COLORS.blue, backgroundColor: 'rgba(59,130,246,0.1)', fill: true, tension: 0.3, pointRadius: 4, borderWidth: 2.5, borderDash: [] },
+          { label: 'S&P 500 Return', data: spData, borderColor: CHART_COLORS.gold, backgroundColor: 'rgba(201,168,76,0.1)', fill: true, tension: 0.3, pointRadius: 4, borderWidth: 2.5, borderDash: [6, 3] }
+        ]
+      },
+      options: {
+        ...baseChartOptions(),
+        interaction: { mode: 'index', intersect: false },
+        scales: {
+          x: { ...baseChartOptions().scales.x },
+          y: { ...baseChartOptions().scales.y, ticks: { ...baseChartOptions().scales.y.ticks, callback: v => fmtK(v) } }
+        }
+      }
+    }));
+  }
+
+  function updateOwnVsRent() {
+    const monthlyRent = +document.getElementById('s-rent').value;
+    const rentInflation = +document.getElementById('s-rentinf').value / 100;
+
+    document.getElementById('v-rent').textContent = fmt(monthlyRent) + '/mo';
+    document.getElementById('v-rentinf').textContent = document.getElementById('s-rentinf').value + '%';
+
+    const years = Array.from({length: 10}, (_, i) => i + 1);
+
+    // Cumulative cost of owning
+    const ownCosts = years.map(y => {
+      let total = 0;
+      for (let yr = 0; yr < y; yr++) {
+        total += monthlyPI * 12;
+        total += hoa * Math.pow(1.03, yr) * 12;
+        total += price * taxRate;
+        total += DEFAULTS.insuranceAnnual;
+      }
+      return Math.round(total);
+    });
+
+    // Cumulative cost of renting + opportunity cost of NOT buying
+    const rentCosts = years.map(y => {
+      let total = 0;
+      for (let yr = 0; yr < y; yr++) {
+        total += monthlyRent * Math.pow(1 + rentInflation, yr) * 12;
+      }
+      return Math.round(total);
+    });
+
+    if (ownVsRentChart) ownVsRentChart.destroy();
+    ownVsRentChart = registerChart(new Chart(document.getElementById('ownVsRentChart'), {
+      type: 'line',
+      data: {
+        labels: years.map(y => 'Year ' + y),
+        datasets: [
+          { label: 'Cumulative Ownership Cost', data: ownCosts, borderColor: CHART_COLORS.blue, backgroundColor: 'rgba(59,130,246,0.08)', fill: true, tension: 0.3, pointRadius: 4, borderWidth: 2.5 },
+          { label: 'Cumulative Rent Cost', data: rentCosts, borderColor: CHART_COLORS.orange, backgroundColor: 'rgba(224,122,48,0.08)', fill: true, tension: 0.3, pointRadius: 4, borderWidth: 2.5, borderDash: [6, 3] }
+        ]
+      },
+      options: {
+        ...baseChartOptions(),
+        interaction: { mode: 'index', intersect: false },
+        scales: {
+          x: { ...baseChartOptions().scales.x },
+          y: { ...baseChartOptions().scales.y, ticks: { ...baseChartOptions().scales.y.ticks, callback: v => fmtK(v) } }
+        }
+      }
+    }));
+  }
+
+  // Sensitivity Matrix
+  function renderMatrix() {
+    const apprRates = [-3, 0, 2, 4, 6];
+    const holdPeriods = [5, 7, 10];
+    const spReturn = 10;
+
+    document.getElementById('matrix-body').innerHTML = apprRates.map(appr => {
+      const cells = holdPeriods.map(y => {
+        const re = calcREReturn(y, appr);
+        const sp = calcSPReturn(y, spReturn);
+        const diff = re - sp;
+        const cls = diff > 0 ? 'matrix-positive' : diff < -5000 ? 'matrix-negative' : 'matrix-neutral';
+        return `<td class="${cls}">${diff > 0 ? '+' : ''}${fmtK(diff)}</td>`;
+      }).join('');
+      return `<tr><td style="text-align:left; font-weight:600">${appr > 0 ? '+' : ''}${appr}% / year</td>${cells}</tr>`;
+    }).join('');
+  }
+
+  // Event listeners
+  ['s-appr', 's-sp'].forEach(id => document.getElementById(id).addEventListener('input', updateREvsSpChart));
+  ['s-rent', 's-rentinf'].forEach(id => document.getElementById(id).addEventListener('input', updateOwnVsRent));
+
+  updateREvsSpChart();
+  updateOwnVsRent();
+  renderMatrix();
+});
+</script>
+</body>
+</html>

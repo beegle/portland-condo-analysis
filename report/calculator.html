@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cost Calculator — Ritz-Carlton Portland</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="page-wrapper">
+  <nav class="nav" id="main-nav"></nav>
+
+  <section class="hero" style="padding-bottom:2rem">
+    <div class="container">
+      <span class="label" style="color:var(--gold)">Total Cost of Ownership</span>
+      <h1 style="margin-top:0.5rem">Run the Numbers</h1>
+      <p class="hero-subtitle">Adjust the sliders to model your specific scenario. All outputs update in real-time. The HOA premium is the single largest variable beyond the purchase price.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <div class="grid grid-2" style="gap:2.5rem">
+        <!-- Sliders (Left) -->
+        <div>
+          <h3 style="margin-bottom:1.5rem">Inputs</h3>
+
+          <div class="slider-group" style="margin-bottom:1.25rem">
+            <div class="slider-header"><span class="slider-label">Purchase Price</span><span class="slider-value" id="v-price"></span></div>
+            <input type="range" id="s-price" min="700000" max="2000000" step="25000" class="calc-slider">
+          </div>
+
+          <div class="slider-group" style="margin-bottom:1.25rem">
+            <div class="slider-header"><span class="slider-label">Down Payment</span><span class="slider-value" id="v-dp"></span></div>
+            <input type="range" id="s-dp" min="10" max="100" step="5" class="calc-slider">
+          </div>
+
+          <div class="slider-group" style="margin-bottom:1.25rem">
+            <div class="slider-header"><span class="slider-label">Mortgage Rate</span><span class="slider-value" id="v-rate"></span></div>
+            <input type="range" id="s-rate" min="4.0" max="8.0" step="0.125" class="calc-slider">
+          </div>
+
+          <div class="slider-group" style="margin-bottom:1.25rem">
+            <div class="slider-header"><span class="slider-label">HOA Monthly</span><span class="slider-value" id="v-hoa"></span></div>
+            <input type="range" id="s-hoa" min="500" max="3000" step="50" class="calc-slider">
+          </div>
+
+          <div class="slider-group" style="margin-bottom:1.25rem">
+            <div class="slider-header"><span class="slider-label">Property Tax Rate</span><span class="slider-value" id="v-tax"></span></div>
+            <input type="range" id="s-tax" min="0.8" max="1.5" step="0.05" class="calc-slider">
+          </div>
+
+          <div class="slider-group" style="margin-bottom:1.25rem">
+            <div class="slider-header"><span class="slider-label">Insurance (Annual)</span><span class="slider-value" id="v-ins"></span></div>
+            <input type="range" id="s-ins" min="500" max="3000" step="100" class="calc-slider">
+          </div>
+
+          <div class="slider-group" style="margin-bottom:1.25rem">
+            <div class="slider-header"><span class="slider-label">Maintenance Reserve (Annual)</span><span class="slider-value" id="v-maint"></span></div>
+            <input type="range" id="s-maint" min="0" max="6000" step="200" class="calc-slider">
+          </div>
+
+          <div class="slider-group" style="margin-bottom:1.25rem">
+            <div class="slider-header"><span class="slider-label">Personal Use (Weeks/Year)</span><span class="slider-value" id="v-weeks"></span></div>
+            <input type="range" id="s-weeks" min="1" max="52" step="1" class="calc-slider">
+          </div>
+
+          <div class="slider-group" style="margin-bottom:1.25rem">
+            <div class="slider-header"><span class="slider-label">Rental Weeks/Year</span><span class="slider-value" id="v-rental"></span></div>
+            <input type="range" id="s-rental" min="0" max="42" step="1" class="calc-slider">
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-header"><span class="slider-label">Rental Nightly Rate</span><span class="slider-value" id="v-nightly"></span></div>
+            <input type="range" id="s-nightly" min="200" max="800" step="25" class="calc-slider">
+          </div>
+        </div>
+
+        <!-- Results (Right) -->
+        <div>
+          <h3 style="margin-bottom:1.5rem">Monthly Breakdown</h3>
+
+          <div class="card" style="margin-bottom:1.5rem">
+            <div id="monthly-breakdown" style="font-size:0.9rem"></div>
+            <div style="border-top:2px solid var(--gold); margin-top:0.75rem; padding-top:0.75rem; display:flex; justify-content:space-between">
+              <span style="font-weight:600; color:var(--gold)">Net Monthly Cost</span>
+              <span style="font-weight:700; font-size:1.2rem; color:var(--gold)" id="net-monthly"></span>
+            </div>
+          </div>
+
+          <div class="grid grid-2" style="gap:1rem; margin-bottom:1.5rem">
+            <div class="metric-card">
+              <span class="metric-label">Annual Cost</span>
+              <span class="metric-value" id="annual-cost" style="font-size:1.5rem; color:var(--gold)"></span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-label">10-Year Cumulative</span>
+              <span class="metric-value" id="ten-year-cost" style="font-size:1.5rem; color:var(--orange)"></span>
+            </div>
+          </div>
+
+          <div class="grid grid-2" style="gap:1rem; margin-bottom:1.5rem">
+            <div class="metric-card card-gold">
+              <span class="metric-label">Cost Per Night (Personal Use)</span>
+              <span class="metric-value" id="cost-per-night" style="font-size:1.5rem; color:var(--gold)"></span>
+              <span class="metric-context" id="night-context"></span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-label">Down Payment</span>
+              <span class="metric-value" id="dp-amount" style="font-size:1.5rem"></span>
+              <span class="metric-context" id="loan-amount"></span>
+            </div>
+          </div>
+
+          <div class="card">
+            <h4 style="margin-bottom:0.75rem">10-Year Ownership Summary</h4>
+            <div id="ten-year-summary" style="font-size:0.88rem"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="page-footer" id="page-footer"></footer>
+</div>
+
+<script src="app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const sliders = {
+    price: document.getElementById('s-price'),
+    dp: document.getElementById('s-dp'),
+    rate: document.getElementById('s-rate'),
+    hoa: document.getElementById('s-hoa'),
+    tax: document.getElementById('s-tax'),
+    ins: document.getElementById('s-ins'),
+    maint: document.getElementById('s-maint'),
+    weeks: document.getElementById('s-weeks'),
+    rental: document.getElementById('s-rental'),
+    nightly: document.getElementById('s-nightly')
+  };
+
+  // Set defaults
+  sliders.price.value = DEFAULTS.purchasePrice;
+  sliders.dp.value = DEFAULTS.downPaymentPct;
+  sliders.rate.value = DEFAULTS.mortgageRate;
+  sliders.hoa.value = DEFAULTS.hoaMonthly;
+  sliders.tax.value = DEFAULTS.propertyTaxRate;
+  sliders.ins.value = DEFAULTS.insuranceAnnual;
+  sliders.maint.value = DEFAULTS.maintenanceReserve;
+  sliders.weeks.value = DEFAULTS.personalUseWeeks;
+  sliders.rental.value = DEFAULTS.rentalWeeks;
+  sliders.nightly.value = DEFAULTS.rentalNightlyRate;
+
+  function recalculate() {
+    const price = +sliders.price.value;
+    const dpPct = +sliders.dp.value / 100;
+    const rate = +sliders.rate.value;
+    const hoa = +sliders.hoa.value;
+    const taxRate = +sliders.tax.value / 100;
+    const insurance = +sliders.ins.value;
+    const maintenance = +sliders.maint.value;
+    const personalWeeks = +sliders.weeks.value;
+    const rentalWeeks = +sliders.rental.value;
+    const nightlyRate = +sliders.nightly.value;
+
+    // Update displayed values
+    document.getElementById('v-price').textContent = fmt(price);
+    document.getElementById('v-dp').textContent = sliders.dp.value + '%';
+    document.getElementById('v-rate').textContent = rate.toFixed(3) + '%';
+    document.getElementById('v-hoa').textContent = fmt(hoa);
+    document.getElementById('v-tax').textContent = sliders.tax.value + '%';
+    document.getElementById('v-ins').textContent = fmt(insurance);
+    document.getElementById('v-maint').textContent = fmt(maintenance);
+    document.getElementById('v-weeks').textContent = personalWeeks + ' weeks';
+    document.getElementById('v-rental').textContent = rentalWeeks + ' weeks';
+    document.getElementById('v-nightly').textContent = fmt(nightlyRate) + '/night';
+
+    const downPayment = price * dpPct;
+    const loanAmount = price - downPayment;
+    const monthlyPI = dpPct >= 1 ? 0 : calculateMonthlyPayment(loanAmount, rate, 360);
+    const monthlyTax = price * taxRate / 12;
+    const monthlyIns = insurance / 12;
+    const monthlyMaint = maintenance / 12;
+    const monthlyRental = rentalWeeks * nightlyRate * 7 / 12;
+
+    const netMonthly = monthlyPI + hoa + monthlyTax + monthlyIns + monthlyMaint - monthlyRental;
+    const annualCost = netMonthly * 12;
+
+    // 10-year cumulative with HOA escalation
+    let tenYearTotal = 0;
+    let tenYearHOA = 0;
+    let tenYearMortgage = 0;
+    let tenYearTax = 0;
+    for (let y = 0; y < 10; y++) {
+      const yearHoa = hoa * Math.pow(1.03, y) * 12;
+      const yearPI = monthlyPI * 12;
+      const yearTax = price * taxRate;
+      const yearIns = insurance;
+      const yearMaint = maintenance;
+      const yearRental = rentalWeeks * nightlyRate * 7;
+      tenYearTotal += yearPI + yearHoa + yearTax + yearIns + yearMaint - yearRental;
+      tenYearHOA += yearHoa;
+      tenYearMortgage += yearPI;
+      tenYearTax += yearTax;
+    }
+
+    const personalNights = personalWeeks * 7;
+    const costPerNight = personalNights > 0 ? annualCost / personalNights : 0;
+    const equityBuildup = dpPct >= 1 ? 0 : calculateCumulativePrincipal(loanAmount, rate, 120);
+
+    // Render monthly breakdown
+    const lines = [
+      { label: 'Mortgage (P&I)', value: monthlyPI, show: dpPct < 1 },
+      { label: 'HOA Dues', value: hoa, show: true },
+      { label: 'Property Tax', value: monthlyTax, show: true },
+      { label: 'Insurance', value: monthlyIns, show: true },
+      { label: 'Maintenance Reserve', value: monthlyMaint, show: maintenance > 0 },
+      { label: 'Rental Income Offset', value: -monthlyRental, show: rentalWeeks > 0 }
+    ];
+
+    document.getElementById('monthly-breakdown').innerHTML = lines
+      .filter(l => l.show)
+      .map(l => `<div style="display:flex; justify-content:space-between; padding:0.35rem 0; border-bottom:1px solid var(--border)">
+        <span style="color:var(--text-secondary)">${l.label}</span>
+        <span style="color:${l.value < 0 ? 'var(--blue)' : 'var(--text-primary)'}">${l.value < 0 ? '-' : ''}${fmt(Math.abs(l.value))}</span>
+      </div>`).join('');
+
+    document.getElementById('net-monthly').textContent = fmt(netMonthly);
+    document.getElementById('annual-cost').textContent = fmtK(annualCost);
+    document.getElementById('ten-year-cost').textContent = fmtK(tenYearTotal);
+    document.getElementById('cost-per-night').textContent = fmt(costPerNight);
+    document.getElementById('night-context').textContent = `${personalNights} nights/year of use`;
+    document.getElementById('dp-amount').textContent = fmtK(downPayment);
+    document.getElementById('loan-amount').textContent = dpPct >= 1 ? 'All cash' : `Loan: ${fmtK(loanAmount)}`;
+
+    document.getElementById('ten-year-summary').innerHTML = `
+      <div style="display:flex; justify-content:space-between; padding:0.35rem 0; border-bottom:1px solid var(--border)">
+        <span style="color:var(--text-secondary)">Total Mortgage Payments</span><span>${fmtK(tenYearMortgage)}</span></div>
+      <div style="display:flex; justify-content:space-between; padding:0.35rem 0; border-bottom:1px solid var(--border)">
+        <span style="color:var(--text-secondary)">Total HOA (with 3% escalation)</span><span style="color:var(--orange)">${fmtK(tenYearHOA)}</span></div>
+      <div style="display:flex; justify-content:space-between; padding:0.35rem 0; border-bottom:1px solid var(--border)">
+        <span style="color:var(--text-secondary)">Total Property Tax</span><span>${fmtK(tenYearTax)}</span></div>
+      <div style="display:flex; justify-content:space-between; padding:0.35rem 0; border-bottom:1px solid var(--border)">
+        <span style="color:var(--text-secondary)">Equity Built (Principal Paid)</span><span style="color:var(--blue)">${fmtK(equityBuildup)}</span></div>
+      <div style="display:flex; justify-content:space-between; padding:0.35rem 0">
+        <span style="color:var(--text-secondary)">Opportunity Cost (DP at 10%)</span><span style="color:var(--orange)">${fmtK(downPayment * (Math.pow(1.10, 10) - 1))}</span></div>
+    `;
+  }
+
+  // Bind all sliders
+  Object.values(sliders).forEach(s => s.addEventListener('input', recalculate));
+  recalculate();
+});
+</script>
+</body>
+</html>
